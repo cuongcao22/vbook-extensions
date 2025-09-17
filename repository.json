@@ -10,6 +10,11 @@
     "description": "Extension trang chinese"
   },
   {
+    "link": "https://raw.githubusercontent.com/cuongcao22/vbook-extensions/master/sangtacviet/plugin.json",
+    "author": "cuong",
+    "description": "Thích là nhích ^^"
+  },
+  {
     "link": "https://raw.githubusercontent.com/nhocconsr/vbook-ext/master/plugin.json",
     "author": "Nhocconsr",
     "description": "Thích là nhích ^^"
