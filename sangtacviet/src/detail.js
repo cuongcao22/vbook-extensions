@@ -1,28 +1,56 @@
 function execute(url) {
-    let response = fetch(url + '/');
+    let response = fetch(url);
+    
     function toCapitalize(sentence) {
+        if (!sentence) return "";
         const words = sentence.split(" ");
-
         return words.map((word) => {
             return word[0].toUpperCase() + word.substring(1);
         }).join(" ");
     }
+
     if (response.ok) {
         let doc = response.html();
-        let author = doc.html().match(/Tác giả:.*?\s+(.*?)\s*</);
-        if (author) author = author[1];
-        let des = doc.select(".blk:has(.fa-water) .blk-body").html();
-        let _detail = 'Tên gốc : ' + doc.select("#oriname").text() + '<br>' + doc.select(".blk:has(.fa-info-circle) > div:nth-child(4)").text() + '<br>' + doc.select(".blk:has(.fa-info-circle) > div:nth-child(3)").text();
-
+        
+        // Lấy tên truyện
+        let name = doc.select("h1").first()?.text() || "";
+        
+        // Lấy tác giả
+        let author = doc.select("h2").first()?.text() || "Unknown";
+        
+        // Lấy ảnh bìa
+        let cover = doc.select("img").first()?.attr("src") || "";
+        if (cover && cover.startsWith('//')) {
+            cover = 'https:' + cover;
+        }
+        
+        // Lấy mô tả
+        let description = doc.select("div:contains('Summary') + div").first()?.html() || 
+                         doc.select(".summary").first()?.html() || "";
+        
+        // Lấy thông tin chi tiết
+        let detail = "";
+        let infoSection = doc.select("div:contains('Info')").parent();
+        if (infoSection.length > 0) {
+            detail = infoSection.text();
+        }
+        
+        // Kiểm tra trạng thái (ongoing/completed)
+        let ongoing = true;
+        if (detail.indexOf("Completed") > -1 || detail.indexOf("Hoàn thành") > -1) {
+            ongoing = false;
+        }
+        
         return Response.success({
-            name: toCapitalize(doc.select("#book_name2").first().text()),
-            cover: doc.select(".container:has(#book_name2) img").first().attr("src"),
-            author: author || 'Unknow',
-            description: des,
-            detail: _detail,
-            ongoing: true,
-            host: "https://sangtacviet.pro"
+            name: toCapitalize(name),
+            cover: cover,
+            author: author,
+            description: description,
+            detail: detail,
+            ongoing: ongoing,
+            host: "https://sangtacviet.app"
         });
     }
+    
     return null;
 }
